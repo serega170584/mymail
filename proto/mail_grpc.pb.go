@@ -4,7 +4,7 @@
 // - protoc             v3.21.12
 // source: mail.proto
 
-package __
+package proto
 
 import (
 	context "context"

@@ -1,6 +1,7 @@
 package main
 
 import (
+	pb "awesomeProject/proto"
 	"context"
 	"flag"
 	"fmt"
@@ -15,11 +16,11 @@ var (
 
 // server is used to implement GreeterServer.
 type server struct {
-	UnimplementedGreeterServer
+	pb.UnimplementedGreeterServer
 }
 
 // SayHello implements GreeterServer
-func (s *server) SayHello(ctx context.Context, in *MyMailRequest) ([]string, error) {
+func (s *server) SayHello(ctx context.Context, in *pb.MyMailRequest) ([]string, error) {
 	log.Printf("Received: %v", in.GetTo())
 	return in.GetTo(), nil
 }
@@ -30,8 +31,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+
 	s := grpc.NewServer()
-	RegisterGreeterServer(s, &server{})
+	pb.RegisterGreeterServer(s, &server{})
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
