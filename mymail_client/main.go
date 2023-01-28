@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var name = flag.String("to", "test", "To name")
+var to = flag.String("to", "test", "To name")
 
 func main() {
 	flag.Parse()
@@ -23,9 +23,9 @@ func main() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	r, err := c.GetResponse(ctx, &pb.MyMailRequest{to: *to})
+	r, err := c.MyMail(ctx, &pb.MyMailRequest{To: *to})
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
 	}
-	log.Printf("Sending: %s", r.GetMessage())
+	log.Printf("Sending: %s", r.String())
 }
