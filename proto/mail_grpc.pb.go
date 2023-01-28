@@ -4,7 +4,7 @@
 // - protoc             v3.21.12
 // source: mail.proto
 
-package proto
+package __
 
 import (
 	context "context"
@@ -19,88 +19,86 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// GreeterClient is the client API for Greeter service.
+// MyMailSerivceClient is the client API for MyMailSerivce service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type GreeterClient interface {
-	// Sends a greeting
+type MyMailSerivceClient interface {
 	MyMail(ctx context.Context, in *MyMailRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
-type greeterClient struct {
+type myMailSerivceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewGreeterClient(cc grpc.ClientConnInterface) GreeterClient {
-	return &greeterClient{cc}
+func NewMyMailSerivceClient(cc grpc.ClientConnInterface) MyMailSerivceClient {
+	return &myMailSerivceClient{cc}
 }
 
-func (c *greeterClient) MyMail(ctx context.Context, in *MyMailRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *myMailSerivceClient) MyMail(ctx context.Context, in *MyMailRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/mymail.Greeter/MyMail", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/mymail.MyMailSerivce/MyMail", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// GreeterServer is the server API for Greeter service.
-// All implementations must embed UnimplementedGreeterServer
+// MyMailSerivceServer is the server API for MyMailSerivce service.
+// All implementations must embed UnimplementedMyMailSerivceServer
 // for forward compatibility
-type GreeterServer interface {
-	// Sends a greeting
+type MyMailSerivceServer interface {
 	MyMail(context.Context, *MyMailRequest) (*emptypb.Empty, error)
-	mustEmbedUnimplementedGreeterServer()
+	mustEmbedUnimplementedMyMailSerivceServer()
 }
 
-// UnimplementedGreeterServer must be embedded to have forward compatible implementations.
-type UnimplementedGreeterServer struct {
+// UnimplementedMyMailSerivceServer must be embedded to have forward compatible implementations.
+type UnimplementedMyMailSerivceServer struct {
 }
 
-func (UnimplementedGreeterServer) MyMail(context.Context, *MyMailRequest) (*emptypb.Empty, error) {
+func (UnimplementedMyMailSerivceServer) MyMail(context.Context, *MyMailRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MyMail not implemented")
 }
-func (UnimplementedGreeterServer) mustEmbedUnimplementedGreeterServer() {}
+func (UnimplementedMyMailSerivceServer) mustEmbedUnimplementedMyMailSerivceServer() {}
 
-// UnsafeGreeterServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to GreeterServer will
+// UnsafeMyMailSerivceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to MyMailSerivceServer will
 // result in compilation errors.
-type UnsafeGreeterServer interface {
-	mustEmbedUnimplementedGreeterServer()
+type UnsafeMyMailSerivceServer interface {
+	mustEmbedUnimplementedMyMailSerivceServer()
 }
 
-func RegisterGreeterServer(s grpc.ServiceRegistrar, srv GreeterServer) {
-	s.RegisterService(&Greeter_ServiceDesc, srv)
+func RegisterMyMailSerivceServer(s grpc.ServiceRegistrar, srv MyMailSerivceServer) {
+	s.RegisterService(&MyMailSerivce_ServiceDesc, srv)
 }
 
-func _Greeter_MyMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MyMailSerivce_MyMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MyMailRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GreeterServer).MyMail(ctx, in)
+		return srv.(MyMailSerivceServer).MyMail(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/mymail.Greeter/MyMail",
+		FullMethod: "/mymail.MyMailSerivce/MyMail",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GreeterServer).MyMail(ctx, req.(*MyMailRequest))
+		return srv.(MyMailSerivceServer).MyMail(ctx, req.(*MyMailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// Greeter_ServiceDesc is the grpc.ServiceDesc for Greeter service.
+// MyMailSerivce_ServiceDesc is the grpc.ServiceDesc for MyMailSerivce service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Greeter_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "mymail.Greeter",
-	HandlerType: (*GreeterServer)(nil),
+var MyMailSerivce_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "mymail.MyMailSerivce",
+	HandlerType: (*MyMailSerivceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "MyMail",
-			Handler:    _Greeter_MyMail_Handler,
+			Handler:    _MyMailSerivce_MyMail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

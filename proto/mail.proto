@@ -6,13 +6,10 @@ package mymail;
 
 import "google/protobuf/empty.proto";
 
-// The greeting service definition.
-service Greeter {
-  // Sends a greeting
+service MyMailSerivce {
   rpc MyMail (MyMailRequest) returns (google.protobuf.Empty) {}
 }
 
-// The request message containing the user's name.
 message MyMailRequest {
   repeated string to = 1;
   string subject = 2;
