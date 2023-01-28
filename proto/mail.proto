@@ -14,3 +14,8 @@ message MyMailRequest {
   repeated string to = 1;
   string subject = 2;
 }
+
+message MyMailReply {
+  repeated string to = 1;
+  string subject = 2;
+}
