@@ -49,7 +49,7 @@ func main() {
 	message.SetHeader("To", config.App.To)
 	message.SetHeader("Subject", "grpc handler was triggered at"+time.Now().String())
 
-	dialer := gomail.NewDialer(config.Mail.Host, config.Mail.Port, "from@gmail.com", "<email_password>")
+	dialer := gomail.NewDialer(config.Mail.Host, config.Mail.Port, "from@gmail.com", "111<email_password>")
 	dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	if err := dialer.DialAndSend(message); err != nil {
