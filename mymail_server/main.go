@@ -3,6 +3,7 @@ package main
 import (
 	pb "awesomeProject/proto"
 	"context"
+	"crypto/tls"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"gopkg.in/gomail.v2"
@@ -54,7 +55,7 @@ func (s *server) MyMail(ctx context.Context, in *pb.MyMailRequest) (*emptypb.Emp
 	message.SetHeader("Subject", "grpc handler was triggered at"+time.Now().String())
 
 	dialer := gomail.NewDialer(config.Mail.Host, config.Mail.Port, config.App.From, config.Mail.Password)
-	//dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+	dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	if err := dialer.DialAndSend(message); err != nil {
 		log.Fatalf("failed to send mail: %v", err)
