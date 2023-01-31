@@ -3,10 +3,10 @@ package main
 import (
 	pb "awesomeProject/proto"
 	"context"
+	"encoding/json"
 	"flag"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"gopkg.in/yaml.v3"
 	"log"
 	"os"
 	"time"
@@ -15,26 +15,28 @@ import (
 var to = flag.String("to", "test", "To name")
 
 type Config struct {
-	Port string `yaml:"port"`
+	App struct {
+		Port string `yaml:"port"`
+	}
 }
 
 func main() {
 	config := &Config{}
 
-	file, err := os.Open("../config.yaml")
+	file, err := os.Open("../config.json")
 	if err != nil {
 		log.Fatalf("failed to open config: %v", err)
 	}
 	defer file.Close()
 
-	d := yaml.NewDecoder(file)
+	d := json.NewDecoder(file)
 
 	if err := d.Decode(&config); err != nil {
 		log.Fatalf("failed to decode config: %v", err)
 	}
 
 	flag.Parse()
-	conn, err := grpc.Dial("localhost:"+config.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial("localhost:"+config.App.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}

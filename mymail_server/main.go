@@ -17,7 +17,9 @@ type server struct {
 }
 
 type Config struct {
-	Port string `yaml:"port"`
+	App struct {
+		Port string `yaml:"port"`
+	}
 }
 
 func (s *server) MyMail(ctx context.Context, in *pb.MyMailRequest) (*emptypb.Empty, error) {
@@ -28,7 +30,7 @@ func (s *server) MyMail(ctx context.Context, in *pb.MyMailRequest) (*emptypb.Emp
 func main() {
 	config := &Config{}
 
-	file, err := os.Open("../config.yaml")
+	file, err := os.Open("../config.json")
 	if err != nil {
 		log.Fatalf("failed to open config: %v", err)
 	}
@@ -40,7 +42,7 @@ func main() {
 		log.Fatalf("failed to decode config: %v", err)
 	}
 
-	lis, err := net.Listen("tcp", ":"+config.Port)
+	lis, err := net.Listen("tcp", ":"+config.App.Port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
