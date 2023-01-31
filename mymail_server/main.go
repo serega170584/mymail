@@ -18,7 +18,9 @@ type server struct {
 
 type Config struct {
 	App struct {
-		Port string `yaml:"port"`
+		Port string `json:"port"`
+		From string `json:"from"`
+		To   string `json:"to"`
 	}
 }
 
