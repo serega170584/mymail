@@ -1,6 +1,7 @@
 package main
 
 import (
+	"awesomeProject/internal"
 	pb "awesomeProject/proto"
 	"context"
 	"encoding/json"
@@ -14,15 +15,8 @@ import (
 
 var to = flag.String("to", "test", "To name")
 
-type Config struct {
-	App struct {
-		Host string `json:"host"`
-		Port string `json:"port"`
-	}
-}
-
 func main() {
-	config := &Config{}
+	config := &internal.Config{}
 
 	file, err := os.Open("../config-local.json")
 	if err != nil {

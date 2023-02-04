@@ -1,6 +1,7 @@
 package main
 
 import (
+	"awesomeProject/internal"
 	pb "awesomeProject/proto"
 	"context"
 	"crypto/tls"
@@ -35,7 +36,7 @@ type Config struct {
 func (s *server) MyMail(ctx context.Context, in *pb.MyMailRequest) (*emptypb.Empty, error) {
 	log.Printf("Received: %v", in.GetTo()+" "+in.GetSubject())
 
-	config := &Config{}
+	config := &internal.Config{}
 
 	file, err := os.Open("../config-local.json")
 	if err != nil {
