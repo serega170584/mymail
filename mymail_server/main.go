@@ -40,14 +40,16 @@ func (s *server) MyMail(ctx context.Context, in *pb.MyMailRequest) (*emptypb.Emp
 
 	file, err := os.Open("../config-local.json")
 	if err != nil {
-		log.Fatalf("failed to open config: %v", err)
+		log.Printf("failed to open config: %v", err)
+		return &emptypb.Empty{}, err
 	}
 	defer file.Close()
 
 	d := yaml.NewDecoder(file)
 
 	if err := d.Decode(&config); err != nil {
-		log.Fatalf("failed to decode config: %v", err)
+		log.Printf("failed to decode config: %v", err)
+		return &emptypb.Empty{}, err
 	}
 
 	message := gomail.NewMessage()
@@ -60,8 +62,10 @@ func (s *server) MyMail(ctx context.Context, in *pb.MyMailRequest) (*emptypb.Emp
 	dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	if err := dialer.DialAndSend(message); err != nil {
-		log.Fatalf("failed to send mail: %v", err)
+		log.Printf("failed to send mail: %v", err)
+		return &emptypb.Empty{}, err
 	}
+	log.Printf("Letter is sent")
 
 	return &emptypb.Empty{}, nil
 }
@@ -78,17 +82,19 @@ func main() {
 	d := json.NewDecoder(file)
 
 	if err := d.Decode(&config); err != nil {
-		log.Fatalf("failed to decode config: %v", err)
+		log.Printf("failed to decode config: %v", err)
+		return
 	}
 
 	lis, err := net.Listen("tcp", ":"+config.App.Port)
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		log.Printf("failed to listen: %v", err)
+		return
 	}
 	s := grpc.NewServer()
 	pb.RegisterMyMailSerivceServer(s, &server{})
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		log.Printf("failed to serve: %v", err)
 	}
 }
