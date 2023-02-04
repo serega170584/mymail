@@ -1,12 +1,13 @@
 {
   "app": {
+    "host": "localhost",
     "port": "4445",
-    "from": "hello@world.com",
-    "to": "hello@world.com"
   },
   "mail": {
     "host": "smtp.gmail.com",
     "port": 587,
-    "password": "********"
+    "password": "********",
+    "from": "hello@world.com",
+    "to": "hello@world.com"
   }
 }

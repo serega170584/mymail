@@ -16,13 +16,8 @@ var to = flag.String("to", "test", "To name")
 
 type Config struct {
 	App struct {
-		Port string `json:"port"`
-		From string `json:"from"`
-		To   string `json:"to"`
-	}
-	Mail struct {
 		Host string `json:"host"`
-		Port int    `json:"port"`
+		Port string `json:"port"`
 	}
 }
 
@@ -42,7 +37,7 @@ func main() {
 	}
 
 	flag.Parse()
-	conn, err := grpc.Dial("localhost:"+config.App.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(config.App.Host+":"+config.App.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}

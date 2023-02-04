@@ -4,6 +4,7 @@ import (
 	pb "awesomeProject/proto"
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"gopkg.in/gomail.v2"
@@ -21,12 +22,12 @@ type server struct {
 type Config struct {
 	App struct {
 		Port string `json:"port"`
-		From string `json:"from"`
-		To   string `json:"to"`
 	}
 	Mail struct {
-		Host     string `json:"host"`
 		Port     int    `json:"port"`
+		From     string `json:"from"`
+		To       string `json:"to"`
+		Host     string `json:"host"`
 		Password string `json:"password"`
 	}
 }
@@ -36,7 +37,7 @@ func (s *server) MyMail(ctx context.Context, in *pb.MyMailRequest) (*emptypb.Emp
 
 	config := &Config{}
 
-	file, err := os.Open("../config.json")
+	file, err := os.Open("../config-local.json")
 	if err != nil {
 		log.Fatalf("failed to open config: %v", err)
 	}
@@ -50,11 +51,11 @@ func (s *server) MyMail(ctx context.Context, in *pb.MyMailRequest) (*emptypb.Emp
 
 	message := gomail.NewMessage()
 
-	message.SetHeader("From", config.App.From)
-	message.SetHeader("To", config.App.To)
+	message.SetHeader("From", config.Mail.From)
+	message.SetHeader("To", config.Mail.To)
 	message.SetHeader("Subject", "grpc handler was triggered at"+time.Now().String())
 
-	dialer := gomail.NewDialer(config.Mail.Host, config.Mail.Port, config.App.From, config.Mail.Password)
+	dialer := gomail.NewDialer(config.Mail.Host, config.Mail.Port, config.Mail.From, config.Mail.Password)
 	dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	if err := dialer.DialAndSend(message); err != nil {
@@ -73,7 +74,7 @@ func main() {
 	}
 	defer file.Close()
 
-	d := yaml.NewDecoder(file)
+	d := json.NewDecoder(file)
 
 	if err := d.Decode(&config); err != nil {
 		log.Fatalf("failed to decode config: %v", err)
