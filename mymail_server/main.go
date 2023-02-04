@@ -67,7 +67,7 @@ func (s *server) MyMail(ctx context.Context, in *pb.MyMailRequest) (*emptypb.Emp
 func main() {
 	config := &Config{}
 
-	file, err := os.Open("../config.json")
+	file, err := os.Open("../config-local.json")
 	if err != nil {
 		log.Fatalf("failed to open config: %v", err)
 	}
