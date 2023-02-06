@@ -36,6 +36,7 @@ func main() {
 	conn, err := grpc.Dial(config.App.Host+":"+config.App.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Printf("did not connect: %v", err)
+		return
 	}
 	defer conn.Close()
 	c := pb.NewMyMailSerivceClient(conn)
@@ -45,6 +46,7 @@ func main() {
 	r, err := c.MyMail(ctx, &pb.MyMailRequest{To: *to})
 	if err != nil {
 		log.Printf("could not greet: %v", err)
+		return
 	}
 	log.Printf("Sending: %s", r.String())
 }
