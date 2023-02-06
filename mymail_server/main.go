@@ -9,7 +9,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"gopkg.in/gomail.v2"
-	"gopkg.in/yaml.v3"
 	"log"
 	"net"
 	"os"
@@ -20,32 +19,19 @@ type server struct {
 	pb.UnimplementedMyMailSerivceServer
 }
 
-type Config struct {
-	App struct {
-		Port string `json:"port"`
-	}
-	Mail struct {
-		Port     int    `json:"port"`
-		From     string `json:"from"`
-		To       string `json:"to"`
-		Host     string `json:"host"`
-		Password string `json:"password"`
-	}
-}
-
 func (s *server) MyMail(ctx context.Context, in *pb.MyMailRequest) (*emptypb.Empty, error) {
 	log.Printf("Received: %v", in.GetTo()+" "+in.GetSubject())
 
 	config := &internal.Config{}
 
-	file, err := os.Open("../config-local.json")
+	file, err := os.Open("../config/config-local.json")
 	if err != nil {
 		log.Printf("failed to open config: %v", err)
 		return &emptypb.Empty{}, err
 	}
 	defer file.Close()
 
-	d := yaml.NewDecoder(file)
+	d := json.NewDecoder(file)
 
 	if err := d.Decode(&config); err != nil {
 		log.Printf("failed to decode config: %v", err)
@@ -71,9 +57,9 @@ func (s *server) MyMail(ctx context.Context, in *pb.MyMailRequest) (*emptypb.Emp
 }
 
 func main() {
-	config := &Config{}
+	config := &internal.Config{}
 
-	file, err := os.Open("../config-local.json")
+	file, err := os.Open("../config/config-local.json")
 	if err != nil {
 		log.Fatalf("failed to open config: %v", err)
 	}

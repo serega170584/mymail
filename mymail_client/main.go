@@ -18,7 +18,7 @@ var to = flag.String("to", "test", "To name")
 func main() {
 	config := &internal.Config{}
 
-	file, err := os.Open("../config-local.json")
+	file, err := os.Open("../config/config-local.json")
 	if err != nil {
 		log.Printf("failed to open config: %v", err)
 		return
