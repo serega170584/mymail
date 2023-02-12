@@ -1,18 +1,15 @@
-package main
+package notifier
 
 import (
 	"awesomeProject/internal/config"
-	"awesomeProject/internal/proto"
 	"context"
-	"flag"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"time"
 )
 
-var to = flag.String("to", "test", "To name")
-
+// TODO: golangci-lint
 func main() {
 	mainConfig, err := config.NewConfig()
 	if err != nil {
@@ -20,7 +17,7 @@ func main() {
 		return
 	}
 
-	flag.Parse()
+	// TODO: fmt.sprintf
 	conn, err := grpc.Dial(mainConfig.App.Host+":"+mainConfig.App.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Printf("did not connect: %v", err)
@@ -31,7 +28,7 @@ func main() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	r, err := c.MyMail(ctx, &__.MyMailRequest{To: *to})
+	r, err := c.Email(ctx, &EmailRequest{To: []string{mainConfig.Mail.To}})
 	if err != nil {
 		log.Printf("could not greet: %v", err)
 		return

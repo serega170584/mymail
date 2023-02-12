@@ -23,7 +23,7 @@ type Config struct {
 func NewConfig() (*Config, error) {
 	config := &Config{}
 
-	file, err := os.Open("../config/config-local.json")
+	file, err := os.Open("./config/local.json")
 	if err != nil {
 		log.Printf("failed to open config: %v", err)
 		return &Config{}, err
