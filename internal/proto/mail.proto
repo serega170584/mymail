@@ -1,18 +1,27 @@
 syntax = "proto3";
 
-option go_package = "./";
+package notifier.v1;
 
-package mymail;
+option go_package = "notifier/";
 
 import "google/protobuf/empty.proto";
 
-service MyMailSerivce {
-  rpc MyMail (MyMailRequest) returns (google.protobuf.Empty) {}
+service Notificator {
+  rpc Email (EmailRequest) returns (google.protobuf.Empty) {}
+  rpc Sms (SmsRequest) returns (google.protobuf.Empty) {}
 }
 
-message MyMailRequest {
-  string to = 1;
+message EmailRequest {
+  enum BodyFormat {
+   _UNSPECIFIED = 0;
+   TEXT = 1;
+   HTML = 2;
+  }
+
+  repeated string to = 1;
   string subject = 2;
+  string body = 3;
+  BodyFormat body_type = 4; // deprecated
 }
 
 message SmsRequest {

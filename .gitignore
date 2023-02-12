@@ -1,3 +1,5 @@
-config/config-local.json
-config-test.json
 .idea
+
+# todo: исключить все конфиги (local, test, prod) кроме эталонного dist.json
+config/*.json
+!config/dist.json

@@ -24,7 +24,7 @@ func main() {
 		return
 	}
 	defer conn.Close()
-	c := __.NewMyMailSerivceClient(conn)
+	c := NewNotificatorClient(conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()

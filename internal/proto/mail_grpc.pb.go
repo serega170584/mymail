@@ -4,7 +4,7 @@
 // - protoc             v3.21.12
 // source: mail.proto
 
-package __
+package notifier
 
 import (
 	context "context"
@@ -19,86 +19,122 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// MyMailSerivceClient is the client API for MyMailSerivce service.
+// NotificatorClient is the client API for Notificator service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type MyMailSerivceClient interface {
-	MyMail(ctx context.Context, in *MyMailRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+type NotificatorClient interface {
+	Email(ctx context.Context, in *EmailRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Sms(ctx context.Context, in *SmsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
-type myMailSerivceClient struct {
+type notificatorClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewMyMailSerivceClient(cc grpc.ClientConnInterface) MyMailSerivceClient {
-	return &myMailSerivceClient{cc}
+func NewNotificatorClient(cc grpc.ClientConnInterface) NotificatorClient {
+	return &notificatorClient{cc}
 }
 
-func (c *myMailSerivceClient) MyMail(ctx context.Context, in *MyMailRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *notificatorClient) Email(ctx context.Context, in *EmailRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/mymail.MyMailSerivce/MyMail", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/notifier.v1.Notificator/Email", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// MyMailSerivceServer is the server API for MyMailSerivce service.
-// All implementations must embed UnimplementedMyMailSerivceServer
+func (c *notificatorClient) Sms(ctx context.Context, in *SmsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/notifier.v1.Notificator/Sms", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// NotificatorServer is the server API for Notificator service.
+// All implementations must embed UnimplementedNotificatorServer
 // for forward compatibility
-type MyMailSerivceServer interface {
-	MyMail(context.Context, *MyMailRequest) (*emptypb.Empty, error)
-	mustEmbedUnimplementedMyMailSerivceServer()
+type NotificatorServer interface {
+	Email(context.Context, *EmailRequest) (*emptypb.Empty, error)
+	Sms(context.Context, *SmsRequest) (*emptypb.Empty, error)
+	mustEmbedUnimplementedNotificatorServer()
 }
 
-// UnimplementedMyMailSerivceServer must be embedded to have forward compatible implementations.
-type UnimplementedMyMailSerivceServer struct {
+// UnimplementedNotificatorServer must be embedded to have forward compatible implementations.
+type UnimplementedNotificatorServer struct {
 }
 
-func (UnimplementedMyMailSerivceServer) MyMail(context.Context, *MyMailRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method MyMail not implemented")
+func (UnimplementedNotificatorServer) Email(context.Context, *EmailRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Email not implemented")
 }
-func (UnimplementedMyMailSerivceServer) mustEmbedUnimplementedMyMailSerivceServer() {}
+func (UnimplementedNotificatorServer) Sms(context.Context, *SmsRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Sms not implemented")
+}
+func (UnimplementedNotificatorServer) mustEmbedUnimplementedNotificatorServer() {}
 
-// UnsafeMyMailSerivceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to MyMailSerivceServer will
+// UnsafeNotificatorServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to NotificatorServer will
 // result in compilation errors.
-type UnsafeMyMailSerivceServer interface {
-	mustEmbedUnimplementedMyMailSerivceServer()
+type UnsafeNotificatorServer interface {
+	mustEmbedUnimplementedNotificatorServer()
 }
 
-func RegisterMyMailSerivceServer(s grpc.ServiceRegistrar, srv MyMailSerivceServer) {
-	s.RegisterService(&MyMailSerivce_ServiceDesc, srv)
+func RegisterNotificatorServer(s grpc.ServiceRegistrar, srv NotificatorServer) {
+	s.RegisterService(&Notificator_ServiceDesc, srv)
 }
 
-func _MyMailSerivce_MyMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MyMailRequest)
+func _Notificator_Email_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmailRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MyMailSerivceServer).MyMail(ctx, in)
+		return srv.(NotificatorServer).Email(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/mymail.MyMailSerivce/MyMail",
+		FullMethod: "/notifier.v1.Notificator/Email",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MyMailSerivceServer).MyMail(ctx, req.(*MyMailRequest))
+		return srv.(NotificatorServer).Email(ctx, req.(*EmailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// MyMailSerivce_ServiceDesc is the grpc.ServiceDesc for MyMailSerivce service.
+func _Notificator_Sms_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SmsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificatorServer).Sms(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/notifier.v1.Notificator/Sms",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificatorServer).Sms(ctx, req.(*SmsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// Notificator_ServiceDesc is the grpc.ServiceDesc for Notificator service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var MyMailSerivce_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "mymail.MyMailSerivce",
-	HandlerType: (*MyMailSerivceServer)(nil),
+var Notificator_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "notifier.v1.Notificator",
+	HandlerType: (*NotificatorServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "MyMail",
-			Handler:    _MyMailSerivce_MyMail_Handler,
+			MethodName: "Email",
+			Handler:    _Notificator_Email_Handler,
+		},
+		{
+			MethodName: "Sms",
+			Handler:    _Notificator_Sms_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
