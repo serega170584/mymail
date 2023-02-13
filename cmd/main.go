@@ -14,15 +14,15 @@ import (
 
 func main() {
 
+	const NetworkLayerTypeTcp = "tcp"
+
 	mainConfig, err := config.NewConfig()
 	if err != nil {
 		log.Printf("Config handle error: %v", err)
 		return
 	}
 
-	// TODO: заменить на константу
-	// http.StatusOK
-	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", mainConfig.App.Host, mainConfig.App.Port))
+	lis, err := net.Listen(NetworkLayerTypeTcp, fmt.Sprintf("%s:%s", mainConfig.App.Host, mainConfig.App.Port))
 	if err != nil {
 		log.Printf("failed to listen: %v", err)
 		return
@@ -34,6 +34,6 @@ func main() {
 		log.Printf("failed to serve: %v", err)
 	}
 
-	// TODO: errorf
-	log.Printf("server listening at %s", lis.Addr())
+	err = fmt.Errorf("server listening at %s has interrupted", lis.Addr())
+	fmt.Println(err.Error())
 }
