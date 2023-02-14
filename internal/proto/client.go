@@ -3,6 +3,7 @@ package notifier
 import (
 	"awesomeProject/internal/config"
 	"context"
+	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
@@ -13,14 +14,14 @@ import (
 func main() {
 	mainConfig, err := config.NewConfig()
 	if err != nil {
-		log.Printf("Config handle error: %v", err)
+		log.Printf("Config handle error: %s", err.Error())
 		return
 	}
 
 	// TODO: fmt.sprintf
-	conn, err := grpc.Dial(mainConfig.App.Host+":"+mainConfig.App.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", mainConfig.App.Host, mainConfig.App.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Printf("did not connect: %v", err)
+		log.Printf("did not connect: %s", err.Error())
 		return
 	}
 	defer conn.Close()
@@ -30,7 +31,7 @@ func main() {
 	defer cancel()
 	r, err := c.Email(ctx, &EmailRequest{To: []string{mainConfig.Mail.To}})
 	if err != nil {
-		log.Printf("could not greet: %v", err)
+		log.Printf("could not greet: %s", err.Error())
 		return
 	}
 	log.Printf("Sending: %s", r.String())
