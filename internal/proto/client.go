@@ -18,7 +18,6 @@ func main() {
 		return
 	}
 
-	// TODO: fmt.sprintf
 	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", mainConfig.App.Host, mainConfig.App.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Printf("did not connect: %s", err.Error())

@@ -25,7 +25,7 @@ func NewConfig() (*Config, error) {
 
 	file, err := os.Open("./config/local.json")
 	if err != nil {
-		log.Printf("failed to open config: %v", err)
+		log.Printf("failed to open config: %s", err.Error())
 		return &Config{}, err
 	}
 	defer file.Close()
@@ -33,7 +33,7 @@ func NewConfig() (*Config, error) {
 	d := json.NewDecoder(file)
 
 	if err := d.Decode(config); err != nil {
-		log.Printf("failed to decode config: %v", err)
+		log.Printf("failed to decode config: %s", err.Error())
 		return &Config{}, err
 	}
 
