@@ -28,6 +28,7 @@ func main() {
 
 	s := grpc.NewServer()
 	notificator.RegisterNotificatorServer(s, &domain.NotificatorServer{})
+	log.Printf("server listening at %s", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Printf("failed to serve: %s", err.Error())
 	}
