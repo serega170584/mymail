@@ -3,7 +3,6 @@ package domain
 import (
 	"awesomeProject/internal/config"
 	notificator "awesomeProject/internal/proto"
-
 	"crypto/tls"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"gopkg.in/gomail.v2"
@@ -15,9 +14,11 @@ import (
 )
 
 type NotificatorServer struct {
-	cfg config.Config
-
 	notificator.UnimplementedNotificatorServer
+}
+
+func NewNotificatorServer() *NotificatorServer {
+	return &NotificatorServer{}
 }
 
 func (r *NotificatorServer) Email(ctx context.Context, in *notificator.EmailRequest) (*emptypb.Empty, error) {
