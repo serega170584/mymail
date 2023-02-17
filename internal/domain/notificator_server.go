@@ -18,7 +18,7 @@ type NotificatorServer struct {
 }
 
 func NewNotificatorServer() *NotificatorServer {
-	return &NotificatorServer111{}
+	return &NotificatorServer{}
 }
 
 func (r *NotificatorServer) Email(ctx context.Context, in *notificator.EmailRequest) (*emptypb.Empty, error) {
