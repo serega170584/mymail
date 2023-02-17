@@ -14,11 +14,10 @@ type Config struct {
 		Port  string `json:"port"`
 	}
 	Mail struct {
-		Port     int    `json:"port"`
-		From     string `json:"from"`
-		To       string `json:"to"`
-		Host     string `json:"host"`
-		Password string `json:"password"`
+		Port int    `json:"port"`
+		From string `json:"from"`
+		To   string `json:"to"`
+		Host string `json:"host"`
 	}
 }
 

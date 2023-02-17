@@ -37,7 +37,7 @@ func (r *NotificatorServer) Email(ctx context.Context, in *notificator.EmailRequ
 	message.SetHeader("Subject", fmt.Sprintf("grpc handler was triggered at %s", time.Now().String()))
 
 	// TODO: google mailchimp если сложно то найдем другое решение
-	dialer := gomail.NewDialer(mainConfig.Mail.Host, mainConfig.Mail.Port, mainConfig.Mail.From, mainConfig.Mail.Password)
+	dialer := gomail.NewDialer(mainConfig.Mail.Host, mainConfig.Mail.Port, mainConfig.Mail.From, "111")
 	dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	if err := dialer.DialAndSend(message); err != nil {
