@@ -4,13 +4,14 @@ import (
 	"awesomeProject/internal/config"
 	"awesomeProject/internal/domain"
 	"fmt"
-	"log"
 )
 
 func main() {
+	logger := &domain.CustomLogger{}
+
 	mainConfig, err := config.NewConfig()
 	if err != nil {
-		log.Printf("Config handle error: %s", err.Error())
+		logger.Error(err.Error())
 		return
 	}
 
