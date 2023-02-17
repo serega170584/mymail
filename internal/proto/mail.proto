@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package notifier.v1;
+
+option go_package = "notifier/";
+
+import "google/protobuf/empty.proto";
+
+service Notificator {
+  rpc Email (EmailRequest) returns (google.protobuf.Empty) {}
+  rpc Sms (SmsRequest) returns (google.protobuf.Empty) {}
+}
+
+message EmailRequest {
+  enum BodyFormat {
+   _UNSPECIFIED = 0;
+   TEXT = 1;
+   HTML = 2;
+  }
+
+  repeated string to = 1;
+  string subject = 2;
+  string body = 3;
+  BodyFormat body_type = 4; // deprecated
+}
+
+message SmsRequest {
+  string number = 1;
+  string msg = 2;
+}
