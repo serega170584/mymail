@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"github.com/spf13/viper"
 )
 
@@ -20,11 +21,14 @@ type Config struct {
 }
 
 func NewConfig() *viper.Viper {
-	config := &viper.Viper{}
-
-	config.SetConfigName("local")
-	config.SetConfigType("json")
+	config := viper.New()
 	config.AddConfigPath("./config")
+	config.SetConfigName("local.json")
+
+	err := viper.ReadInConfig() // Find and read the config file
+	if err != nil {             // Handle errors reading the config file
+		fmt.Printf("fatal error config file: %s", err.Error())
+	}
 
 	return config
 }
