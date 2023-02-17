@@ -8,8 +8,10 @@ import (
 
 type Config struct {
 	App struct {
-		Host string `json:"host"`
-		Port string `json:"port"`
+		Env   string `json:"env"`
+		Debug bool   `json:"debug"`
+		Host  string `json:"host"`
+		Port  string `json:"port"`
 	}
 	Mail struct {
 		Port     int    `json:"port"`
