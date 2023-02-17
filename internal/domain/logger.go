@@ -40,7 +40,7 @@ func (l *CustomLogger) message(level string, message string) {
 		customInfo.Output(2, message)
 		fmt.Println(&buf)
 	} else {
-		f, err := os.OpenFile("log.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 777)
+		f, err := os.OpenFile("log.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
 		if err != nil {
 			log.Printf("Fatal: failed to open log: %s", err.Error())
 		}
