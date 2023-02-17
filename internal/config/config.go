@@ -1,9 +1,7 @@
 package config
 
 import (
-	"encoding/json"
-	"log"
-	"os"
+	"github.com/spf13/viper"
 )
 
 type Config struct {
@@ -21,22 +19,12 @@ type Config struct {
 	}
 }
 
-func NewConfig() (*Config, error) {
-	config := &Config{}
+func NewConfig() *viper.Viper {
+	config := &viper.Viper{}
 
-	file, err := os.Open("./config/local.json")
-	if err != nil {
-		log.Printf("failed to open config: %s", err.Error())
-		return &Config{}, err
-	}
-	defer file.Close()
+	config.SetConfigName("local")
+	config.SetConfigType("json")
+	config.AddConfigPath("./config")
 
-	d := json.NewDecoder(file)
-
-	if err := d.Decode(config); err != nil {
-		log.Printf("failed to decode config: %s", err.Error())
-		return &Config{}, err
-	}
-
-	return config, nil
+	return config
 }

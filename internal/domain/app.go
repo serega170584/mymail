@@ -1,18 +1,18 @@
 package domain
 
 import (
-	"awesomeProject/internal/config"
 	notificator "awesomeProject/internal/proto"
 	"fmt"
+	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"net"
 )
 
 type App struct {
-	cfg *config.Config
+	cfg *viper.Viper
 }
 
-func NewApp(config *config.Config) *App {
+func NewApp(config *viper.Viper) *App {
 	return &App{cfg: config}
 }
 
@@ -23,7 +23,7 @@ func (l *App) Run() error {
 
 	cfg := l.cfg
 
-	lis, err := net.Listen(NetworkLayerTypeTcp, fmt.Sprintf("%s:%s", cfg.App.Host, cfg.App.Port))
+	lis, err := net.Listen(NetworkLayerTypeTcp, fmt.Sprintf("%s:%s", cfg.GetString("app.host"), cfg.GetString("app.port")))
 	if err != nil {
 		logger.Error(fmt.Sprintf("failed to listen: %s", err.Error()))
 		return err

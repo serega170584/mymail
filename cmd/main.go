@@ -9,16 +9,12 @@ import (
 func main() {
 	logger := &domain.CustomLogger{}
 
-	mainConfig, err := config.NewConfig()
-	if err != nil {
-		logger.Error(err.Error())
-		return
-	}
+	mainConfig := config.NewConfig()
 
 	app := domain.NewApp(mainConfig)
-	err = app.Run()
+	err := app.Run()
 
 	if err != nil {
-		fmt.Println("server listening at has interrupted\n", err)
+		logger.Error(fmt.Sprintf("server listening at has interrupted %s\n", err.Error()))
 	}
 }

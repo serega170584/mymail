@@ -27,12 +27,9 @@ func (l *CustomLogger) Info(message string) {
 }
 
 func (l *CustomLogger) message(level string, message string) {
-	mainConfig, err := config.NewConfig()
-	if err != nil {
-		fmt.Printf("failed to open config: %s", err.Error())
-	}
+	mainConfig := config.NewConfig()
 
-	isDebug := mainConfig.App.Env != "prod" && mainConfig.App.Debug
+	isDebug := mainConfig.GetString("app.env") != "prod" && mainConfig.GetBool("app.debug")
 
 	if isDebug {
 		buf := bytes.Buffer{}

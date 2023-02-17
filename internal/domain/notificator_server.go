@@ -22,22 +22,18 @@ func NewNotificatorServer() *NotificatorServer {
 }
 
 func (r *NotificatorServer) Email(ctx context.Context, in *notificator.EmailRequest) (*emptypb.Empty, error) {
-	mainConfig, err := config.NewConfig()
-	if err != nil {
-		log.Printf("Config handle error: %s", err.Error())
-		return &emptypb.Empty{}, err
-	}
+	mainConfig := config.NewConfig()
 
 	log.Println("Received:", in.GetTo(), in.GetSubject())
 
 	message := gomail.NewMessage()
 
-	message.SetHeader("From", mainConfig.Mail.From)
+	message.SetHeader("From", mainConfig.GetString("mail.from"))
 	message.SetHeader("To", in.To...)
 	message.SetHeader("Subject", fmt.Sprintf("grpc handler was triggered at %s", time.Now().String()))
 
 	// TODO: google mailchimp если сложно то найдем другое решение
-	dialer := gomail.NewDialer(mainConfig.Mail.Host, mainConfig.Mail.Port, mainConfig.Mail.From, "111")
+	dialer := gomail.NewDialer(mainConfig.GetString("mail.host"), mainConfig.GetInt("mail.port"), mainConfig.GetString("mail.from"), "111")
 	dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	if err := dialer.DialAndSend(message); err != nil {
