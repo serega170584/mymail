@@ -27,14 +27,16 @@ func (app *App) Run() error {
 
 	logger := app.logger
 
-	lis, err := net.Listen(NetworkLayerTypeTcp, fmt.Sprintf("%s:%s", app.config.GetString("app.host"), app.config.GetString("app.port")))
+	config := app.config
+
+	lis, err := net.Listen(NetworkLayerTypeTcp, fmt.Sprintf("%s:%s", config.GetString("app.host"), config.GetString("app.port")))
 	if err != nil {
 		logger.Error(fmt.Sprintf("failed to listen: %s", err.Error()))
 		return err
 	}
 
 	s := grpc.NewServer()
-	notificatorServer := server.New(app.config, app.logger)
+	notificatorServer := server.New(config, logger)
 	notificator.RegisterNotificatorServer(s, notificatorServer)
 	logger.Info(fmt.Sprintf("server listening at %s", lis.Addr()))
 	if err := s.Serve(lis); err != nil {
