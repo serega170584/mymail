@@ -25,18 +25,20 @@ func New(config *viper.Viper) *App {
 func (app *App) Run() error {
 	const NetworkLayerTypeTcp = "tcp"
 
+	logger := app.logger
+
 	lis, err := net.Listen(NetworkLayerTypeTcp, fmt.Sprintf("%s:%s", app.config.GetString("app.host"), app.config.GetString("app.port")))
 	if err != nil {
-		app.logger.Error(fmt.Sprintf("failed to listen: %s", err.Error()))
+		logger.Error(fmt.Sprintf("failed to listen: %s", err.Error()))
 		return err
 	}
 
 	s := grpc.NewServer()
 	notificatorServer := server.New(app.config, app.logger)
 	notificator.RegisterNotificatorServer(s, notificatorServer)
-	app.logger.Info(fmt.Sprintf("server listening at %s", lis.Addr()))
+	logger.Info(fmt.Sprintf("server listening at %s", lis.Addr()))
 	if err := s.Serve(lis); err != nil {
-		app.logger.Error(fmt.Sprintf("failed to serve: %s", err.Error()))
+		logger.Error(fmt.Sprintf("failed to serve: %s", err.Error()))
 		return err
 	}
 
