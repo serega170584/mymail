@@ -1,9 +1,11 @@
-package domain
+package server
 
 import (
-	"awesomeProject/internal/config"
+	"awesomeProject/internal/logger"
 	notificator "awesomeProject/internal/proto"
 	"crypto/tls"
+
+	"github.com/spf13/viper"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"gopkg.in/gomail.v2"
 
@@ -15,34 +17,37 @@ import (
 
 type NotificatorServer struct {
 	notificator.UnimplementedNotificatorServer
+	config *viper.Viper
+	logger *logger.Logger
 }
 
-func NewNotificatorServer() *NotificatorServer {
-	return &NotificatorServer{}
+func New(config *viper.Viper, logger *logger.Logger) *NotificatorServer {
+	return &NotificatorServer{config: config, logger: logger}
 }
 
-func (r *NotificatorServer) Email(ctx context.Context, in *notificator.EmailRequest) (*emptypb.Empty, error) {
-	mainConfig := config.NewConfig()
+func (server *NotificatorServer) Email(ctx context.Context, in *notificator.EmailRequest) (*emptypb.Empty, error) {
+	logger := server.logger
 
-	log.Println("Received:", in.GetTo(), in.GetSubject())
+	logger.Info(fmt.Sprintf("To: %s, Subject: %s", in.GetTo(), in.GetSubject()))
 
 	message := gomail.NewMessage()
 
-	message.SetHeader("From", mainConfig.GetString("mail.from"))
+	config := server.config
+
+	message.SetHeader("From", config.GetString("mail.from"))
 	message.SetHeader("To", in.To...)
 	message.SetHeader("Subject", fmt.Sprintf("grpc handler was triggered at %s", time.Now().String()))
 
 	// TODO: google mailchimp если сложно то найдем другое решение
-	dialer := gomail.NewDialer(mainConfig.GetString("mail.host"), mainConfig.GetInt("mail.port"), mainConfig.GetString("mail.from"), "111")
+	dialer := gomail.NewDialer(config.GetString("mail.host"), config.GetInt("mail.port"), config.GetString("mail.from"), "111")
 	dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	if err := dialer.DialAndSend(message); err != nil {
-		// todo назвать различия прописывания ошибки двумя способами
-		log.Printf("failed to send mail: %v\n", err)
-		log.Printf("failed to send mail: %s\n", err.Error())
+		logger.Error(fmt.Sprintf("failed to send mail: %s\n", err.Error()))
 		return &emptypb.Empty{}, err
 	}
-	log.Printf("Letter is sent")
+
+	logger.Info("Letter is sent")
 
 	return &emptypb.Empty{}, nil
 }

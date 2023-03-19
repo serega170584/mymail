@@ -1,20 +1,20 @@
 package main
 
 import (
+	"awesomeProject/internal/app"
 	"awesomeProject/internal/config"
-	"awesomeProject/internal/domain"
+
 	"fmt"
+	"log"
 )
 
 func main() {
-	logger := &domain.CustomLogger{}
+	config := config.New()
 
-	mainConfig := config.NewConfig()
-
-	app := domain.NewApp(mainConfig)
+	app := app.New(config)
 	err := app.Run()
 
 	if err != nil {
-		logger.Error(fmt.Sprintf("server listening at has interrupted %s\n", err.Error()))
+		log.Println(fmt.Sprintf("server listening at has interrupted %s\n", err.Error()))
 	}
 }

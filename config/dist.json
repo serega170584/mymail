@@ -3,7 +3,11 @@
     "env": "dev",
     "debug": true,
     "host": "localhost",
-    "port": "4447"
+    "port": "4447",
+    "log": {
+      "filename": "log.log",
+      "prefix": "prefix"
+    }
   },
   "mail": {
     "host": "smtp.gmail.com",

@@ -4,15 +4,16 @@ import (
 	"awesomeProject/internal/config"
 	"context"
 	"fmt"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"time"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 // TODO: golangci-lint
 func main() {
-	mainConfig := config.NewConfig()
+	mainConfig := config.New()
 
 	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", mainConfig.GetString("app.host"), mainConfig.GetString("app.port")), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
