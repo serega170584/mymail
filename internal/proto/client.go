@@ -20,7 +20,12 @@ func main() {
 		log.Printf("did not connect: %s", err.Error())
 		return
 	}
-	defer conn.Close()
+	err = conn.Close()
+	if err != nil {
+		log.Printf("did not close connection: %s", err.Error())
+		return
+	}
+
 	c := NewNotificatorClient(conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)

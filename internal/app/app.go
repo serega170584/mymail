@@ -18,29 +18,29 @@ type App struct {
 }
 
 func New(config *viper.Viper) *App {
-	logger := logger.New(config.GetString("app.env") == "prod", config.GetBool("app.debug"), config.GetString("app.log.filename"), config.GetString("app.log.prefix"))
-	return &App{config, logger}
+	appLogger := logger.New(config.GetString("app.env") == "prod", config.GetBool("app.debug"), config.GetString("app.log.filename"))
+	return &App{config, appLogger}
 }
 
 func (app *App) Run() error {
 	const NetworkLayerTypeTcp = "tcp"
 
-	logger := app.logger
+	appLogger := app.logger
 
 	config := app.config
 
 	lis, err := net.Listen(NetworkLayerTypeTcp, fmt.Sprintf("%s:%s", config.GetString("app.host"), config.GetString("app.port")))
 	if err != nil {
-		logger.Error(fmt.Sprintf("failed to listen: %s", err.Error()))
+		appLogger.Error(fmt.Sprintf("failed to listen: %s", err.Error()))
 		return err
 	}
 
 	s := grpc.NewServer()
-	notificatorServer := server.New(config, logger)
+	notificatorServer := server.New(config, appLogger)
 	notificator.RegisterNotificatorServer(s, notificatorServer)
-	logger.Info(fmt.Sprintf("server listening at %s", lis.Addr()))
+	appLogger.Info(fmt.Sprintf("server listening at %s", lis.Addr()))
 	if err := s.Serve(lis); err != nil {
-		logger.Error(fmt.Sprintf("failed to serve: %s", err.Error()))
+		appLogger.Error(fmt.Sprintf("failed to serve: %s", err.Error()))
 		return err
 	}
 

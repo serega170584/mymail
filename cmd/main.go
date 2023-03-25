@@ -9,10 +9,10 @@ import (
 )
 
 func main() {
-	config := config.New()
+	appConfig := config.New()
 
-	app := app.New(config)
-	err := app.Run()
+	appApp := app.New(appConfig)
+	err := appApp.Run()
 
 	if err != nil {
 		log.Println(fmt.Sprintf("server listening at has interrupted %s\n", err.Error()))
