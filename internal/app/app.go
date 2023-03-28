@@ -1,46 +1,54 @@
 package app
 
 import (
-	notificator "awesomeProject/internal/proto"
+	"context"
 	"fmt"
+	"log"
 	"net"
+
+	"go.opentelemetry.io/otel/trace"
+
+	proto "awesomeProject/internal/proto"
 
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 
-	"awesomeProject/internal/logger"
-	"awesomeProject/internal/server"
+	"awesomeProject/internal/service"
 )
 
 type App struct {
-	config *viper.Viper
-	logger *logger.Logger
+	Config *viper.Viper
+	Tracer trace.Tracer
 }
 
-func New(config *viper.Viper) *App {
-	appLogger := logger.New(config.GetString("app.env") == "prod", config.GetBool("app.debug"), config.GetString("app.log.filename"))
-	return &App{config, appLogger}
+func New(config *viper.Viper, tracer trace.Tracer) *App {
+	return &App{
+		config,
+		tracer,
+	}
 }
 
-func (app *App) Run() error {
+func (app *App) Run(ctx context.Context) error {
+	_, span := app.Tracer.Start(ctx, "app.run")
+	defer span.End()
+
 	const NetworkLayerTypeTcp = "tcp"
 
-	appLogger := app.logger
-
-	config := app.config
-
-	lis, err := net.Listen(NetworkLayerTypeTcp, fmt.Sprintf("%s:%s", config.GetString("app.host"), config.GetString("app.port")))
+	lis, err := net.Listen(
+		NetworkLayerTypeTcp,
+		fmt.Sprintf("%s:%s", app.Config.GetString("app.host"), app.Config.GetString("app.port")),
+	)
 	if err != nil {
-		appLogger.Error(fmt.Sprintf("failed to listen: %s", err.Error()))
+		log.Printf("failed to listen: %s", err.Error())
 		return err
 	}
 
 	s := grpc.NewServer()
-	notificatorServer := server.New(config, appLogger)
-	notificator.RegisterNotificatorServer(s, notificatorServer)
-	appLogger.Info(fmt.Sprintf("server listening at %s", lis.Addr()))
-	if err := s.Serve(lis); err != nil {
-		appLogger.Error(fmt.Sprintf("failed to serve: %s", err.Error()))
+	notificatorServer := service.New(app.Config, app.Tracer)
+	proto.RegisterNotificatorServer(s, notificatorServer)
+	log.Printf("server listening at %s", lis.Addr())
+	if err = s.Serve(lis); err != nil {
+		log.Printf("failed to serve: %s", err.Error())
 		return err
 	}
 
