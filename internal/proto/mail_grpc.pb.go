@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.12
-// source: mail.proto
+// source: internal/proto/mail.proto
 
 package notifier
 
@@ -138,5 +138,5 @@ var Notificator_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "mail.proto",
+	Metadata: "internal/proto/mail.proto",
 }

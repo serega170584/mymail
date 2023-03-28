@@ -1,4 +1,4 @@
-package server
+package notificator
 
 import (
 	"context"
@@ -7,10 +7,6 @@ import (
 	"log"
 	"time"
 
-	"go.opentelemetry.io/otel"
-
-	"awesomeProject/internal/jaeger"
-	"awesomeProject/internal/logger"
 	notificator "awesomeProject/internal/proto"
 
 	"github.com/spf13/viper"
@@ -21,27 +17,16 @@ import (
 type NotificatorServer struct {
 	notificator.UnimplementedNotificatorServer
 	config *viper.Viper
-	logger *logger.Logger
 }
 
-func New(config *viper.Viper, logger *logger.Logger) *NotificatorServer {
+func New(config *viper.Viper) *NotificatorServer {
 	return &NotificatorServer{
 		config: config,
-		logger: logger,
 	}
 }
 
 func (server *NotificatorServer) Email(ctx context.Context, in *notificator.EmailRequest) (*emptypb.Empty, error) {
-	tracerProvider, err := jaeger.TracerProvider("http://localhost:14268/api/traces")
-	if err != nil {
-		server.logger.Error(fmt.Sprintf("failed to init jaeger: %s\n", err.Error()))
-	}
-	otel.SetTracerProvider(tracerProvider)
-	tracer := tracerProvider.Tracer("notif-server-email")
-	_, span := tracer.Start(ctx, "Test")
-	defer span.End()
-
-	server.logger.Info(fmt.Sprintf("To: %s, Subject: %s", in.GetTo(), in.GetSubject()))
+	log.Printf("To: %s, Subject: %s\n", in.GetTo(), in.GetSubject())
 
 	message := gomail.NewMessage()
 	message.SetHeader("From", server.config.GetString("mail.from"))
@@ -52,16 +37,16 @@ func (server *NotificatorServer) Email(ctx context.Context, in *notificator.Emai
 	dialer := gomail.NewDialer(server.config.GetString("mail.host"), server.config.GetInt("mail.port"), server.config.GetString("mail.from"), "111")
 	dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	if err := dialer.DialAndSend(message); err != nil {
-		server.logger.Error(fmt.Sprintf("failed to send mail: %s\n", err.Error()))
+		log.Printf("failed to send mail: %s\n", err.Error())
 		return &emptypb.Empty{}, err
 	}
-	server.logger.Info("Letter is sent")
+	log.Println("email is sent")
 
 	return &emptypb.Empty{}, nil
 }
 
 func (server *NotificatorServer) Sms(ctx context.Context, in *notificator.SmsRequest) (*emptypb.Empty, error) {
-	log.Printf("method is not implemented, exit code 1")
+	log.Println("method is not implemented, exit code 1")
 
 	return &emptypb.Empty{}, nil
 }
