@@ -4,3 +4,4 @@ config/*.json
 !config/dist.json
 
 .env
+*.log
