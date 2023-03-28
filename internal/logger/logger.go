@@ -24,7 +24,7 @@ func (logger *Logger) sendMessageToBuffer(message string, level string) {
 	writer := &bytes.Buffer{}
 
 	baseLogger := log.New(writer, level, log.Llongfile)
-	baseLogger.Output(2, message)
+	_ = baseLogger.Output(2, message)
 	fmt.Println(writer)
 }
 

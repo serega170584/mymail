@@ -1,11 +1,10 @@
 package main
 
 import (
+	"log"
+
 	"awesomeProject/internal/app"
 	"awesomeProject/internal/config"
-
-	"fmt"
-	"log"
 )
 
 func main() {
@@ -15,6 +14,6 @@ func main() {
 	err := appApp.Run()
 
 	if err != nil {
-		log.Println(fmt.Sprintf("server listening at has interrupted %s\n", err.Error()))
+		log.Printf("server listening at has interrupted %s\n", err.Error())
 	}
 }

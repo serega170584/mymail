@@ -1,18 +1,18 @@
 package notifier
 
 import (
-	"awesomeProject/internal/config"
 	"context"
 	"fmt"
 	"log"
 	"time"
 
+	"awesomeProject/internal/config"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-// TODO: golangci-lint
-func main() {
+func NewClient() {
 	mainConfig := config.New()
 
 	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", mainConfig.GetString("app.host"), mainConfig.GetString("app.port")), grpc.WithTransportCredentials(insecure.NewCredentials()))
