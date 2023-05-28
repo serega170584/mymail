@@ -20,11 +20,13 @@ func NewClient() {
 		log.Printf("did not connect: %s", err.Error())
 		return
 	}
-	err = conn.Close()
-	if err != nil {
-		log.Printf("did not close connection: %s", err.Error())
-		return
-	}
+
+	defer func(conn *grpc.ClientConn) {
+		err := conn.Close()
+		if err != nil {
+			log.Printf("did not close connection: %s", err.Error())
+		}
+	}(conn)
 
 	c := NewNotificatorClient(conn)
 
