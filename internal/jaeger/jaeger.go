@@ -16,8 +16,10 @@ import (
 )
 
 const (
-	service     = "mymail-demo"
-	environment = "production"
+	service           = "mymail-demo"
+	environment       = "prod"
+	DefaultTracerUrl  = "http://127.0.0.1:14268/api/traces"
+	DefaultTracerName = "mymail-jaeger-tracer"
 )
 
 func tracerProvider(url string) (*tracesdk.TracerProvider, error) {
@@ -26,11 +28,12 @@ func tracerProvider(url string) (*tracesdk.TracerProvider, error) {
 		return nil, err
 	}
 
-	serviceName, ok := os.LookupEnv("APP_NAME")
+	serviceName, ok := os.LookupEnv("JAEGER_APP_NAME")
 	if !ok {
 		serviceName = service
 	}
-	env, ok := os.LookupEnv("ENV_NAME")
+
+	env, ok := os.LookupEnv("JAEGER_ENV_NAME")
 	if !ok {
 		env = environment
 	}
@@ -49,7 +52,12 @@ func tracerProvider(url string) (*tracesdk.TracerProvider, error) {
 }
 
 func New(ctx context.Context) trace.Tracer {
-	tp, err := tracerProvider("http://127.0.0.1:14268/api/traces")
+	tracerUrl, ok := os.LookupEnv("JAEGER_TRACER_URL")
+	if !ok {
+		tracerUrl = DefaultTracerUrl
+	}
+
+	tp, err := tracerProvider(tracerUrl)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -58,5 +66,10 @@ func New(ctx context.Context) trace.Tracer {
 	_, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	return tp.Tracer("mymail-jaeger-tracer")
+	tracerName, ok := os.LookupEnv("JAEGER_TRACER_NAME")
+	if !ok {
+		tracerName = DefaultTracerName
+	}
+
+	return tp.Tracer(tracerName)
 }
