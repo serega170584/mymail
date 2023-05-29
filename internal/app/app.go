@@ -1,14 +1,12 @@
 package app
 
 import (
+	proto "awesomeProject/internal/proto"
 	"context"
 	"fmt"
+	"go.opentelemetry.io/otel/trace"
 	"log"
 	"net"
-
-	"go.opentelemetry.io/otel/trace"
-
-	proto "awesomeProject/internal/proto"
 
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
@@ -29,6 +27,7 @@ func New(config *viper.Viper, tracer trace.Tracer) *App {
 }
 
 func (app *App) Run(ctx context.Context) error {
+
 	_, span := app.Tracer.Start(ctx, "app.run")
 	defer span.End()
 

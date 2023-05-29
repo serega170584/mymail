@@ -1,8 +1,10 @@
 package service
 
 import (
+	"awesomeProject/internal/event"
 	"context"
 	"fmt"
+	"github.com/segmentio/kafka-go"
 	"log"
 	"time"
 
@@ -33,6 +35,21 @@ func (server *NotificatorServer) Email(ctx context.Context, in *notificator.Emai
 	defer span.End()
 
 	log.Printf("To: %s, Subject: %s\n", in.GetTo(), in.GetSubject())
+
+	eventName := "mail_send"
+	eventConn, err := event.New(server.config, eventName)
+
+	if err != nil {
+		fmt.Printf("Event %s conn error: %s", eventName, err.Error())
+	}
+	err = eventConn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+	if err != nil {
+		fmt.Printf("EVent write deadline error: %s", err.Error())
+	}
+	_, err = eventConn.WriteMessages(kafka.Message{Value: []byte("test")})
+	if err != nil {
+		fmt.Printf("Event write message error: %s", err.Error())
+	}
 
 	message := gomail.NewMessage()
 	message.SetHeader("From", server.config.GetString("mail.from"))
