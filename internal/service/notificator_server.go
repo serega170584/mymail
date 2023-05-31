@@ -20,12 +20,14 @@ type NotificatorServer struct {
 	notificator.UnimplementedNotificatorServer
 	config *viper.Viper
 	tracer trace.Tracer
+	event  *event.Event
 }
 
-func New(config *viper.Viper, tracer trace.Tracer) *NotificatorServer {
+func New(config *viper.Viper, tracer trace.Tracer, e *event.Event) *NotificatorServer {
 	return &NotificatorServer{
 		config: config,
 		tracer: tracer,
+		event:  e,
 	}
 }
 
@@ -37,13 +39,9 @@ func (server *NotificatorServer) Email(ctx context.Context, in *notificator.Emai
 
 	config := server.config
 
-	e, err := event.New()
+	err := server.event.Produce(config.GetString("events.mail_send.topic"), "test123456")
 	if err != nil {
-		fmt.Printf("Event producer getting error %s", err.Error())
-	}
-
-	if e != nil {
-		err = e.Produce(config.GetString("events.mail_send.topic"), "test")
+		fmt.Print("Event produce error: %s", err.Error())
 	}
 
 	message := gomail.NewMessage()

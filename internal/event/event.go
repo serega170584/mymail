@@ -16,7 +16,7 @@ type Event struct {
 	producer *kafka.Producer
 }
 
-func New() (*Event, error) {
+func New() *Event {
 	host, ok := os.LookupEnv("KAFKA_HOST")
 	if !ok {
 		host = DefaultKafkaHost
@@ -33,10 +33,9 @@ func New() (*Event, error) {
 
 	if err != nil {
 		fmt.Printf("Failed to create producer: %s\n", err.Error())
-		return nil, err
 	}
 
-	return &Event{producer: p}, nil
+	return &Event{producer: p}
 }
 
 func (event *Event) Produce(topic string, message string) error {

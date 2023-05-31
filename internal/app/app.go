@@ -1,6 +1,7 @@
 package app
 
 import (
+	"awesomeProject/internal/event"
 	proto "awesomeProject/internal/proto"
 	"context"
 	"fmt"
@@ -17,12 +18,14 @@ import (
 type App struct {
 	Config *viper.Viper
 	Tracer trace.Tracer
+	Event  *event.Event
 }
 
-func New(config *viper.Viper, tracer trace.Tracer) *App {
+func New(config *viper.Viper, tracer trace.Tracer, e *event.Event) *App {
 	return &App{
 		config,
 		tracer,
+		e,
 	}
 }
 
@@ -43,7 +46,7 @@ func (app *App) Run(ctx context.Context) error {
 	}
 
 	s := grpc.NewServer()
-	notificatorServer := service.New(app.Config, app.Tracer)
+	notificatorServer := service.New(app.Config, app.Tracer, app.Event)
 	proto.RegisterNotificatorServer(s, notificatorServer)
 	log.Printf("server listening at %s", lis.Addr())
 	if err = s.Serve(lis); err != nil {
