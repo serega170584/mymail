@@ -1,10 +1,8 @@
 package event
 
 import (
-	"context"
 	"fmt"
-	"github.com/segmentio/kafka-go"
-	"github.com/spf13/viper"
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"net"
 	"os"
 )
@@ -14,7 +12,11 @@ const (
 	DefaultKafkaPort = "9092"
 )
 
-func New(config *viper.Viper, eventName string) (*kafka.Conn, error) {
+type Event struct {
+	producer *kafka.Producer
+}
+
+func New() (*Event, error) {
 	host, ok := os.LookupEnv("KAFKA_HOST")
 	if !ok {
 		host = DefaultKafkaHost
@@ -25,17 +27,43 @@ func New(config *viper.Viper, eventName string) (*kafka.Conn, error) {
 		port = DefaultKafkaPort
 	}
 
-	eventName = fmt.Sprintf("%s.%s.%s", "events", eventName, "topic")
-	conn, err := kafka.DialLeader(context.Background(), "tcp", net.JoinHostPort(host, port), config.GetString(eventName), 0)
-	if err != nil {
-		fmt.Printf("Kafka connection error: %s", err.Error())
-	}
-	defer func(conn *kafka.Conn) {
-		err := conn.Close()
-		if err != nil {
-			fmt.Printf("Kafka connection close error: %s", err.Error())
-		}
-	}(conn)
+	broker := net.JoinHostPort(host, port)
 
-	return conn, err
+	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": broker})
+
+	if err != nil {
+		fmt.Printf("Failed to create producer: %s\n", err.Error())
+		return nil, err
+	}
+
+	return &Event{producer: p}, nil
+}
+
+func (event *Event) Produce(topic string, message string) error {
+	deliveryChan := make(chan kafka.Event)
+
+	p := event.producer
+	err := p.Produce(&kafka.Message{
+		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+		Value:          []byte(message),
+	}, deliveryChan)
+
+	if err != nil {
+		fmt.Printf("Producer deliver channel error: %s", err.Error())
+		return err
+	}
+
+	e := <-deliveryChan
+	m := e.(*kafka.Message)
+
+	if m.TopicPartition.Error != nil {
+		fmt.Printf("Delivery failed: %v\n", m.TopicPartition.Error)
+	} else {
+		fmt.Printf("Delivered message to topic %s [%d] at offset %v\n",
+			*m.TopicPartition.Topic, m.TopicPartition.Partition, m.TopicPartition.Offset)
+	}
+
+	close(deliveryChan)
+
+	return nil
 }
