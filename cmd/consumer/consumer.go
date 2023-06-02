@@ -1,22 +1,51 @@
 package main
 
 import (
+	"awesomeProject/internal/config"
+	notifier "awesomeProject/internal/proto"
+	"encoding/json"
 	"fmt"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"gopkg.in/gomail.v2"
+	"log"
+	"net"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 func main() {
+	const (
+		defaultKafkaHost = "localhost"
+		defaultKafkaPort = "9092"
+	)
+
+	if len(os.Args) != 4 {
+		fmt.Printf("Usage: %s <broker> <group> <timeoutms..>\n", os.Args[0])
+		os.Exit(1)
+	}
+
+	conf := config.New()
+
+	kafkaHost, ok := os.LookupEnv("KAFKA_HOST")
+	if !ok {
+		kafkaHost = defaultKafkaHost
+	}
+
+	kafkaPort, ok := os.LookupEnv("KAFKA_PORT")
+	if !ok {
+		kafkaPort = defaultKafkaPort
+	}
+
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers":     "localhost:9092",
+		"bootstrap.servers":     net.JoinHostPort(kafkaHost, kafkaPort),
 		"broker.address.family": "v4",
-		"group.id":              "my-topic-group",
-		"session.timeout.ms":    6000,
+		"group.id":              os.Args[1],
+		"session.timeout.ms":    os.Args[3],
 		"auto.offset.reset":     "earliest",
 	})
 
@@ -27,7 +56,7 @@ func main() {
 
 	fmt.Printf("Created Consumer %v\n", c)
 
-	topics := []string{"my-topic"}
+	topics := []string{os.Args[2]}
 	err = c.SubscribeTopics(topics, nil)
 	if err != nil {
 		fmt.Printf("Subscribe topic event attempt error: %s\n", err.Error())
@@ -49,8 +78,28 @@ func main() {
 
 			switch e := ev.(type) {
 			case *kafka.Message:
-				fmt.Printf("%% Message on %s:\n%s\n",
-					e.TopicPartition, string(e.Value))
+				fmt.Printf("%% Message on %s:\n%s\n", e.TopicPartition, string(e.Value))
+
+				var in *notifier.EmailRequest
+				err = json.Unmarshal(e.Value, &in)
+				if err != nil {
+					fmt.Printf("Unmararshal email request: %s", err.Error())
+					run = false
+					break
+				}
+
+				message := gomail.NewMessage()
+				message.SetHeader("From", conf.GetString("mail.from"))
+				message.SetHeader("To", in.To...)
+				message.SetHeader("Subject", fmt.Sprintf("grpc handler was triggered at %s", time.Now().String()))
+				// TODO: google mailchimp если сложно то найдем другое решение
+				// dialer := gomail.NewDialer(server.config.GetString("mail.host"), server.config.GetInt("mail.port"), server.config.GetString("mail.from"), "111")
+				// dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+				// if err := dialer.DialAndSend(message); err != nil {
+				// 	log.Printf("failed to send mail: %s\n", err.Error())
+				// 	return &emptypb.Empty{}, err
+				// }
+				log.Println("email is sent")
 				if e.Headers != nil {
 					fmt.Printf("%% Headers: %v\n", e.Headers)
 				}
