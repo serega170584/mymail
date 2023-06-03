@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"gopkg.in/gomail.v2"
-	"log"
 	"net"
 	"os"
 	"os/signal"
@@ -99,7 +98,7 @@ func main() {
 				// 	log.Printf("failed to send mail: %s\n", err.Error())
 				// 	return &emptypb.Empty{}, err
 				// }
-				log.Println("email is sent")
+				fmt.Println("email is sent")
 				if e.Headers != nil {
 					fmt.Printf("%% Headers: %v\n", e.Headers)
 				}
