@@ -1,30 +1,31 @@
 package service
 
 import (
+	"awesomeProject/internal/event"
 	"context"
+	"encoding/json"
 	"fmt"
-	"log"
-	"time"
-
 	"go.opentelemetry.io/otel/trace"
+	"log"
 
 	notificator "awesomeProject/internal/proto"
 
 	"github.com/spf13/viper"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"gopkg.in/gomail.v2"
 )
 
 type NotificatorServer struct {
 	notificator.UnimplementedNotificatorServer
 	config *viper.Viper
 	tracer trace.Tracer
+	event  *event.Event
 }
 
-func New(config *viper.Viper, tracer trace.Tracer) *NotificatorServer {
+func New(config *viper.Viper, tracer trace.Tracer, e *event.Event) *NotificatorServer {
 	return &NotificatorServer{
 		config: config,
 		tracer: tracer,
+		event:  e,
 	}
 }
 
@@ -34,19 +35,20 @@ func (server *NotificatorServer) Email(ctx context.Context, in *notificator.Emai
 
 	log.Printf("To: %s, Subject: %s\n", in.GetTo(), in.GetSubject())
 
-	message := gomail.NewMessage()
-	message.SetHeader("From", server.config.GetString("mail.from"))
-	message.SetHeader("To", in.To...)
-	message.SetHeader("Subject", fmt.Sprintf("grpc handler was triggered at %s", time.Now().String()))
+	config := server.config
 
-	// TODO: google mailchimp если сложно то найдем другое решение
-	// dialer := gomail.NewDialer(server.config.GetString("mail.host"), server.config.GetInt("mail.port"), server.config.GetString("mail.from"), "111")
-	// dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
-	// if err := dialer.DialAndSend(message); err != nil {
-	// 	log.Printf("failed to send mail: %s\n", err.Error())
-	// 	return &emptypb.Empty{}, err
-	// }
-	log.Println("email is sent")
+	request, err := json.Marshal(in)
+
+	if err != nil {
+		fmt.Printf("To header marshal error: %s", err.Error())
+		return nil, err
+	}
+
+	err = server.event.Produce(config.GetString("events.mail_send.topic"), string(request))
+	if err != nil {
+		fmt.Print("Event produce error: %s", err.Error())
+		return nil, err
+	}
 
 	return &emptypb.Empty{}, nil
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"awesomeProject/internal/event"
 	"context"
 	"log"
 	"os"
@@ -24,7 +25,9 @@ func main() {
 	ctx, span := tracer.Start(ctx, spanName)
 	defer span.End()
 
-	appApp := app.New(config.New(), tracer)
+	e := event.New()
+
+	appApp := app.New(config.New(), tracer, e)
 	err := appApp.Run(ctx)
 	if err != nil {
 		log.Printf("server is interrupted, err: %s\n", err.Error())
