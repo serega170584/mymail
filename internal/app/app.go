@@ -41,7 +41,7 @@ func (app *App) Run(ctx context.Context) error {
 
 	lis, err := net.Listen(
 		NetworkLayerTypeTcp,
-		fmt.Sprintf("%s:%s", app.Config.GetString("app.host"), app.Config.GetString("app.port")),
+		net.JoinHostPort(app.Config.GetString("app.host"), app.Config.GetString("app.port")),
 	)
 	if err != nil {
 		log.Printf("failed to listen: %s", err.Error())
