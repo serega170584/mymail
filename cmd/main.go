@@ -51,15 +51,17 @@ func main() {
 		return
 	}
 
-	lis, err := net.Listen("tcp", ":"+mainConfig.App.Port)
+	lis, err := net.Listen("tcp", "localhost"+":"+mainConfig.App.Port)
 	if err != nil {
 		log.Printf("failed to listen: %v", err)
 		return
 	}
 	s := grpc.NewServer()
 	__.RegisterMyMailSerivceServer(s, &server{})
-	log.Printf("server listening at %v", lis.Addr())
+
 	if err := s.Serve(lis); err != nil {
 		log.Printf("failed to serve: %v", err)
 	}
+
+	log.Printf("server listening at %v", lis.Addr())
 }
